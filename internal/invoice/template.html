@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{{.Number}} - {{.BilledTo.Name}} - {{.Date}}</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { font-family:'Inter',sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+@page { size:A4; margin:0; }
+.page { width:595.92pt; min-height:841.92pt; background:#fff; display:flex; flex-direction:column; justify-content:space-between; position:relative; }
+.ink-normal{color:#111827;} .ink-subtle{color:#6B7280;}
+.heading-medium{font-size:20px;font-weight:600;font-family:'Inter';letter-spacing:-0.02em;}
+.heading-small{font-size:18px;font-weight:600;letter-spacing:-0.01em;}
+.body-medium-semibold{font-size:14px;font-weight:600;}
+.body-medium-medium{font-size:14px;font-weight:500;}
+.body-small-medium{font-size:12px;font-weight:500;}
+.body-small-semibold{font-size:12px;font-weight:600;}
+.body-xsmall-medium{font-size:10px;font-weight:500;}
+.body-xsmall-regular{font-size:10px;font-weight:400;}
+.caption-small{font-size:8px;font-weight:400;}
+.flex{display:flex;} .col{flex-direction:column;} .row{flex-direction:row;}
+.between{justify-content:space-between;} .end{align-items:flex-end;} .items-end-col{align-items:flex-end;}
+.p8{padding:32px;} .p6{padding:24px;} .p3{padding:12px;} .p2{padding:8px;}
+.flex1{flex:1;}
+.box{border:0.5px solid #E5E7EB;background:#F9FAFB;border-radius:8px;}
+.gray50{background:#F9FAFB;}
+.bb-muted{border-bottom:1px solid #E5E7EB;}
+.bt-200{border-top:1px solid #E5E7EB;}
+.sep{border-top:0.5px solid #E5E7EB;width:100%;}
+.mb1{margin-bottom:4px;} .mb2{margin-bottom:8px;} .mb5{margin-bottom:20px;} .mt2{margin-top:8px;}
+.mt5{margin-top:20px;} .mt10{margin-top:40px;} .ml6{margin-left:24px;} .gap2{gap:8px;} .gap3{gap:12px;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="flex1 p8">
+    <div class="flex row between">
+      <div class="flex col">
+        <div class="mb2"><h1 class="heading-medium ink-normal">{{.Seller.Name}}</h1></div>
+        <p class="body-small-medium ink-subtle mb1">{{.Seller.Email}}</p>
+        <div class="flex col ink-subtle">
+          {{range .Seller.Address}}<p class="body-xsmall-medium">{{.}}</p>{{end}}
+        </div>
+        <div class="flex col ink-subtle mt2">
+          {{range .Seller.TaxIDs}}<p class="body-xsmall-medium">{{.}}</p>{{end}}
+        </div>
+      </div>
+      <div class="flex col" style="align-items:flex-end;gap:8px;">
+        <h1 class="heading-medium ink-normal">Tax Invoice</h1>
+      </div>
+    </div>
+    <div class="mt10">
+      <div class="flex row box p6">
+        <div class="flex col" style="width:35%;">
+          <p class="body-xsmall-medium ink-subtle mb2">Billed To</p>
+          <p class="body-medium-semibold ink-normal">{{.BilledTo.Name}}</p>
+          {{with .BilledTo.Email}}<p class="body-xsmall-medium ink-subtle">{{.}}</p>{{end}}
+          <div class="flex col body-xsmall-medium ink-subtle mt2">
+            {{range .BilledTo.Address}}<p class="mb1">{{.}}</p>{{end}}
+          </div>
+          {{if .BilledTo.TaxIDs}}<div class="flex col body-xsmall-medium ink-subtle mt2">
+            {{range .BilledTo.TaxIDs}}<p class="mb1">{{.}}</p>{{end}}
+          </div>{{end}}
+        </div>
+        <div class="flex col ml6" style="width:65%;">
+          <div class="flex row between mb5">
+            <div class="flex col">
+              <p class="body-xsmall-medium ink-subtle mb2">Invoice Number</p>
+              <p class="body-medium-medium ink-normal">{{.Number}}</p>
+            </div>
+            <div class="flex col items-end-col">
+              <p class="body-xsmall-medium ink-subtle mb2">Invoice amount</p>
+              <p class="heading-small ink-normal" style="text-align:right;">{{.Currency}}{{.NBSP}}{{.TotalFmt}}</p>
+            </div>
+          </div>
+          <div class="flex row between">
+            <div class="flex col">
+              <p class="body-xsmall-medium ink-subtle mb2">Invoice Date</p>
+              <p class="body-small-medium ink-normal">{{.Date}}</p>
+            </div>
+            <div class="flex col items-end-col">
+              <p class="body-xsmall-medium ink-subtle mb2">Due Date</p>
+              <p class="body-small-medium ink-normal">{{.Due}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex col bb-muted mt5">
+        <div class="flex row gray50 p3" style="align-items:center;width:100%;">
+          <div style="width:35%;"><p class="body-xsmall-medium ink-normal">ITEM DETAIL</p></div>
+          <div style="width:16.25%;" class="flex items-end-col col"><p class="body-xsmall-medium ink-normal">HSN/SAC</p></div>
+          <div style="width:16.25%;" class="flex items-end-col col"><p class="body-xsmall-medium ink-normal">QTY</p></div>
+          <div style="width:16.25%;" class="flex items-end-col col"><p class="body-xsmall-medium ink-normal">Rate ({{.Currency}})</p></div>
+          <div style="width:16.25%;" class="flex items-end-col col"><p class="body-xsmall-medium ink-normal">Amount ({{.Currency}})</p></div>
+        </div>
+        {{range .Items}}
+        <div class="flex row p3" style="align-items:center;">
+          <div class="flex col" style="width:35%;"><p class="body-small-medium ink-normal">{{.Detail}}</p></div>
+          <div style="width:16.25%;" class="flex col items-end-col"><p class="body-small-medium ink-normal">{{.HSN}}</p></div>
+          <div style="width:16.25%;" class="flex col items-end-col"><p class="body-small-medium ink-normal">{{.Qty}}</p></div>
+          <div style="width:16.25%;" class="flex col items-end-col"><p class="body-small-medium ink-normal">{{.Rate}}</p></div>
+          <div style="width:16.25%;" class="flex col items-end-col"><p class="body-small-medium ink-normal">{{.Amount}}</p></div>
+        </div>
+        {{end}}
+      </div>
+      <div class="flex row" style="justify-content:flex-end;padding:24px 16px;">
+        <div class="flex col gap3" style="width:40%;">
+          <div class="flex row between body-small-medium ink-normal"><p>Subtotal</p><p>{{.Currency}}{{.NBSP}}{{.TotalFmt}}</p></div>
+          <div class="sep"></div>
+          <div class="flex row between"><p class="body-small-semibold ink-normal">Total</p><p class="body-small-semibold ink-normal">{{.Currency}}{{.NBSP}}{{.TotalFmt}}</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex col gap3">
+    <div class="bt-200 p8" style="background:#fff;">
+      <div class="flex row" style="align-items:flex-end;width:100%;">
+        <div class="flex1" style="width:65%;max-width:65%;">
+          <div class="mb5 flex col gap2 p2" style="border-radius:8px;max-width:100%;overflow:hidden;">
+            <p class="body-xsmall-medium ink-subtle mb2">Payment Instructions</p>
+            {{range .Payment}}
+            <div class="flex row between">
+              <p class="body-xsmall-medium ink-normal" style="width:50%;">{{.Label}}</p>
+              <p class="body-xsmall-regular ink-normal" style="width:50%;">{{.Value}}</p>
+            </div>
+            {{end}}
+          </div>
+        </div>
+        <div class="flex1 flex col" style="width:35%;max-width:35%;align-items:flex-end;padding-left:20px;min-height:200px;justify-content:flex-end;">
+        </div>
+      </div>
+      {{if .Note}}<p class="caption-small ink-subtle" style="margin-top:8px;">{{.Note}}</p>{{end}}
+    </div>
+  </div>
+</div>
+</body>
+</html>

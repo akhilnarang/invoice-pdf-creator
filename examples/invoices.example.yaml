@@ -1,0 +1,96 @@
+# Example configuration. All values in this file are placeholders.
+# Copy this file to ./invoices.yaml. Then put your real data in the copy.
+# Git ignores invoices.yaml.
+#
+#   cp examples/invoices.example.yaml invoices.yaml
+#   # Put your data in invoices.yaml.
+#   invoice-pdf-creator gen --config invoices.yaml --out ./out
+#
+# Add --html-only to write HTML files without Chrome.
+
+defaults:
+  currency: INR
+  seller:
+    name: Jane Contractor
+    email: jane@example.com
+    address:
+      - "123 Example Street"
+      - "Apt 4"
+      - "Pune, Maharashtra"
+      - "India, 411000"
+  billedTo:
+    name: Acme Corp
+    address:
+      - "1 Market Plaza, Suite 100"
+      - "San Francisco, CA"
+      - "US, 94000-0000"
+
+taxIdPresets:
+  pan_only:
+    - "PAN: ABCDE1234F"
+  full:
+    - "GSTIN: 27ABCDE1234F1Z5"
+    - "PAN: ABCDE1234F"
+    - "IEC: ABCDE1234F"
+
+notes:
+  lut: "Supply meant for export under bond or Letter of Undertaking without payment of integrated tax vide LUT No. AD0000000000000."
+
+bankPresets:
+  # A list of label and value rows. Add the rows that the bank needs.
+  india_bank:
+    - { label: "Beneficiary Name:", value: "JANE CONTRACTOR" }
+    - { label: "Bank Name:", value: "EXAMPLE BANK" }
+    - { label: "Account Number:", value: "00000000000" }
+    - { label: "IFSC Code:", value: "EXMP0000000" }
+    - { label: "Branch:", value: "Example Branch, Pune" }
+    - { label: "Bank Address:", value: "1 Bank Road, Example Branch, Pune, Maharashtra 411000" }
+  us_bank:
+    - { label: "Beneficiary Name:", value: "JANE CONTRACTOR" }
+    - { label: "Bank Name:", value: "EXAMPLE BANK, N.A" }
+    - { label: "Account Number:", value: "00000000000" }
+    - { label: "Account Type:", value: "Business Checking" }
+    - { label: "ACH Routing Number:", value: "000000000" }
+    - { label: "Fedwire Routing Number:", value: "000000000" }
+    - { label: "SWIFT/BIC Code:", value: "EXMPUS00XXX" }
+    - { label: "Bank Address:", value: "1 Bank Plaza, New York, NY 10000, USA" }
+
+# You can write line items in two ways:
+#  (a) Calculated: the program calculates the amount as rateValue * qtyValue.
+#      It shows the rate as rateValue followed by rateUnit.
+#  (b) Literal: write the rate and amount text yourself. Also set `total:`.
+invoices:
+  # Invoice before the GST and LUT period. It shows only the PAN and has no LUT
+  # footer. It uses a calculated item.
+  - number: INV-0000-01
+    date: "12 Feb, 2026"
+    due: "12 Feb, 2026"
+    bank: india_bank
+    taxIds: pan_only
+    items:
+      - { detail: "Contractor Hourly", qty: "72", rateValue: 1000.00, qtyValue: 72, rateUnit: "/hrs" }
+
+  # Domestic INR invoice with all tax IDs and an LUT footer. It uses a calculated
+  # item.
+  - number: INV-0000-02
+    date: "05 Jan, 2026"
+    due: "05 Jan, 2026"
+    bank: india_bank
+    taxIds: full
+    noteName: lut
+    items:
+      - { detail: "Contractor Hourly", qty: "80", rateValue: 1000.00, qtyValue: 80, rateUnit: "/hrs" }
+
+  # USD invoice with literal line items and a set total. It uses the US bank
+  # preset.
+  - number: INV-0000-03
+    date: "18 May, 2026"
+    due: "18 May, 2026"
+    currency: USD
+    bank: us_bank
+    taxIds: full
+    noteName: lut
+    items:
+      - { detail: "Contractor Hourly", qty: "80", rate: "15.00/hrs", amount: "1,200.00" }
+      - { detail: "Bonus", qty: "1", rate: "500/unit", amount: "500.00" }
+    total: 1700.00

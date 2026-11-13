@@ -1,0 +1,20 @@
+# Local program files
+/invoice-pdf-creator
+/invoice-pdf-creator.exe
+
+# Generated invoice files
+/out/
+*.pdf
+
+# Local invoice data can contain personal and bank data.
+# Keep the example configuration file in Git.
+/invoices*.yaml
+/invoices*.yml
+
+# Local environment files can contain secrets.
+/.env
+/.env.*
+!/.env.example
+
+# Local test output
+/coverage.out
